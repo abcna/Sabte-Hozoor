@@ -47,22 +47,20 @@ npm run dev
 
 ### ۳) بیلد
 
-اسکریپت بیلد این کارها را می‌کند:
+اسکریپت بیلد فقط `prisma generate` + `next build` می‌زند (db push داخل بیلد Vercel نیست تا دیپلوی fail نشود).
 
-1. `prisma generate`
-2. `prisma db push` → ساخت جدول‌ها روی دیتابیس پروداکشن
-3. `next build`
+بعد از دیپلوی موفق، **یک‌بار** اسکما را روی دیتابیس پروداکشن بساز:
 
-بعد از اولین دیپلوی موفق، یک‌بار seed ادمین را روی پروداکشن اجرا کن:
+1. در Vercel → Storage → Prisma Postgres → **`.env` / connection string** را کپی کن (`DATABASE_URL`)
+2. موقتاً در `.env` لوکال بگذار
+3. اجرا کن:
 
 ```bash
-# از لوکال، با URL پروداکشن:
-vercel env pull .env.production.local
-# DATABASE_URL را از فایل pull شده بردار و موقتاً در .env بگذار، بعد:
+npm run db:push
 npm run db:seed
 ```
 
-یا در Vercel → Storage → Prisma → با connection string در Prisma Studio / CLI seed کن.
+بعد لاگین با `admin` / `ADMIN_BOOTSTRAP_PASSWORD`.
 
 ### ۴) Redeploy
 
