@@ -1,80 +1,87 @@
 # Safadaroo Attendance (MVP)
 
-Pharmacy staff check-in / check-out with GPS geofencing. Dark glass UI. Deploy on Vercel.
+سیستم حضور و غیاب داروخانه با GPS و سلفی. UI فارسی RTL. دیپلوی روی Vercel.
 
-See `PROJECT.en.md` / `PROJECT.md` for full product & architecture notes.
+جزئیات محصول: `PROJECT.md` / `PROJECT.en.md`
 
 ## Stack
 
 - Next.js (App Router) + React + TypeScript
-- Tailwind CSS (dark + glassmorphism)
-- Prisma + PostgreSQL
-- JWT session cookie (`jose` + `bcryptjs`)
+- Tailwind CSS (دارک + گلس)
+- Prisma + PostgreSQL (Prisma Postgres روی Vercel)
+- JWT session (`jose` + `bcryptjs`)
 
-## Setup
-
-1. Copy env file:
+## راه‌اندازی لوکال
 
 ```bash
 cp .env.example .env
-```
-
-2. Set `DATABASE_URL` (Neon / Vercel Postgres recommended), `AUTH_SECRET`, and optional `ADMIN_BOOTSTRAP_PASSWORD`.
-
-   Local Postgres via Docker (if installed):
-
-```bash
-docker compose up -d
-```
-
-   Default local URL is already in `.env.example` style:
-   `postgresql://timesheet:timesheet@localhost:5432/timesheet`
-
-3. Install & prepare DB:
-
-```bash
 npm install
 npx prisma db push
 npm run db:seed
-```
-
-4. Run locally:
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+ادمین پیش‌فرض: `admin` / مقدار `ADMIN_BOOTSTRAP_PASSWORD` (پیش‌فرض `admin123`)
 
-Default admin (after seed):
+## دیپلوی روی Vercel + Prisma Postgres
 
-- username: `admin`
-- password: value of `ADMIN_BOOTSTRAP_PASSWORD` (default `admin123`)
+### ۱) اتصال دیتابیس
 
-**Change the admin password after first login.**
+1. در پروژه Vercel برو به **Storage**
+2. دیتابیس **Prisma Postgres** (مثلاً `sabte-hozoor`) را **Connect** کن
+3. Vercel خودش `DATABASE_URL` را برای Production / Preview ست می‌کند
 
-## Deploy on Vercel
+مستندات: [Prisma Postgres on Vercel](https://www.prisma.io/docs/guides/postgres/vercel)
 
-1. Push repo and import into Vercel.
-2. Add env vars: `DATABASE_URL`, `AUTH_SECRET`, `ADMIN_BOOTSTRAP_PASSWORD`, `NEXT_PUBLIC_APP_URL`.
-3. Build uses `prisma generate` via `postinstall`.
-4. Run `prisma db push` (or migrate) against production DB once, then `npm run db:seed`.
+### ۲) Environment Variables دستی
 
-Geolocation requires HTTPS (Vercel provides this).
+در **Settings → Environment Variables** این‌ها را اضافه کن (Production + Preview):
+
+| Variable | مثال |
+|----------|------|
+| `AUTH_SECRET` | یک رشته تصادفی بلند |
+| `ADMIN_BOOTSTRAP_PASSWORD` | رمز ادمین اولیه |
+| `NEXT_PUBLIC_APP_URL` | `https://YOUR-APP.vercel.app` |
+
+`DATABASE_URL` را Prisma Postgres ست می‌کند — دوباره دستی لازم نیست مگر بخواهی override کنی.
+
+### ۳) بیلد
+
+اسکریپت بیلد این کارها را می‌کند:
+
+1. `prisma generate`
+2. `prisma db push` → ساخت جدول‌ها روی دیتابیس پروداکشن
+3. `next build`
+
+بعد از اولین دیپلوی موفق، یک‌بار seed ادمین را روی پروداکشن اجرا کن:
+
+```bash
+# از لوکال، با URL پروداکشن:
+vercel env pull .env.production.local
+# DATABASE_URL را از فایل pull شده بردار و موقتاً در .env بگذار، بعد:
+npm run db:seed
+```
+
+یا در Vercel → Storage → Prisma → با connection string در Prisma Studio / CLI seed کن.
+
+### ۴) Redeploy
+
+بعد از ست کردن envها، یک **Redeploy** بزن.
+
+## جریان کار
+
+1. ادمین: لوکیشن + شیفت + کاربر
+2. کارمند: ورود → سلفی زنده + GPS → ثبت ورود / خروج
+3. خارج از شعاع: «باید حتماً در داروخانه حاضر باشید.»
+
+GPS و دوربین روی HTTPS کار می‌کنند (Vercel پیش‌فرض HTTPS است).
 
 ## Scripts
 
 | Script | Purpose |
 |--------|---------|
-| `npm run dev` | Local development |
-| `npm run build` | Production build |
-| `npm run db:push` | Push Prisma schema |
-| `npm run db:seed` | Seed admin user |
+| `npm run dev` | لوکال |
+| `npm run build` | generate + db push + next build |
+| `npm run db:push` | همگام‌سازی اسکما |
+| `npm run db:seed` | ساخت ادمین |
 | `npm run db:studio` | Prisma Studio |
-
-## Flow
-
-1. Admin creates **Locations** (lat/lng + radius) and **Shifts**.
-2. Admin creates **Users** and assigns location + shift.
-3. Employee signs in → **Check In** / **Check Out**.
-4. Server validates distance with Haversine; outside radius returns: *You must be present at the pharmacy.*
