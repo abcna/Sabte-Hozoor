@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  employee
+}
+
+enum AttendanceType {
+  check_in
+  check_out
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  username     String   @unique
+  passwordHash String
+  phone        String
+  role         Role     @default(employee)
+  locationId   String?
+  shiftId      String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  location    Location?          @relation(fields: [locationId], references: [id])
+  shift       Shift?             @relation(fields: [shiftId], references: [id])
+  attendance  AttendanceRecord[]
+}
+
+model Location {
+  id           String   @id @default(cuid())
+  name         String
+  latitude     Float
+  longitude    Float
+  radiusMeters Int      @default(150)
+  address      String?
+  createdAt    DateTime @default(now())
+
+  users      User[]
+  attendance AttendanceRecord[]
+}
+
+model Shift {
+  id        String   @id @default(cuid())
+  name      String
+  startTime String
+  endTime   String
+  createdAt DateTime @default(now())
+
+  users User[]
+}
+
+model AttendanceRecord {
+  id              String         @id @default(cuid())
+  userId          String
+  locationId      String
+  type            AttendanceType
+  recordedAt      DateTime       @default(now())
+  clientLatitude  Float
+  clientLongitude Float
+  distanceMeters  Float
+  /// Compressed selfie (base64 without data-URL prefix); required for check_in
+  photoBase64     String?
+  photoMime       String?
+  createdAt       DateTime       @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id])
+
+  @@index([userId, recordedAt])
+  @@index([recordedAt])
+}

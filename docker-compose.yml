@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: timesheet
+      POSTGRES_PASSWORD: timesheet
+      POSTGRES_DB: timesheet
+    volumes:
+      - timesheet_pg:/var/lib/postgresql/data
+
+volumes:
+  timesheet_pg:
