@@ -16,7 +16,7 @@ export function Input({ className, label, error, id, ...props }: Props) {
       <input
         id={inputId}
         className={cn(
-          "h-11 rounded-xl px-3.5 text-[var(--text-primary)]",
+          "h-11 rounded-xl px-3.5 text-base text-[var(--text-primary)]",
           "bg-white/5 border border-[var(--glass-border)]",
           "placeholder:text-[var(--text-muted)]",
           "outline-none transition-shadow duration-200",

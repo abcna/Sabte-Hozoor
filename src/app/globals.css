@@ -73,8 +73,13 @@ body {
   }
 }
 
+/* iOS zooms focused fields when font-size < 16px */
 input,
 select,
+textarea {
+  font-size: 16px;
+}
+
 button {
   font: inherit;
 }
