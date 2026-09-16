@@ -14,6 +14,7 @@ export function Button({
   size = "md",
   loading,
   disabled,
+  type = "button",
   children,
   ...props
 }: Props) {
@@ -36,6 +37,7 @@ export function Button({
 
   return (
     <button
+      type={type}
       className={cn(
         "inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]",

@@ -99,8 +99,16 @@ export default function AttendancePage() {
       }
       setMessage("ورود با موفقیت ثبت شد.");
       await refresh();
-    } catch {
-      setError("دسترسی به موقعیت مکانی لازم است.");
+    } catch (err) {
+      const msg =
+        err instanceof Error && err.message
+          ? err.message
+          : "ثبت ورود ناموفق بود. لوکیشن و اینترنت را چک کنید.";
+      setError(
+        msg.includes("موقعیت") || msg.includes("Geolocation") || msg.includes("geolocation")
+          ? "دسترسی به موقعیت مکانی لازم است. در تنظیمات Safari اجازه لوکیشن بدهید."
+          : "ثبت ورود ناموفق بود. دوباره تلاش کنید.",
+      );
     } finally {
       setLoading(false);
     }
