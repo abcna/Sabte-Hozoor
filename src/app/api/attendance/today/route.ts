@@ -34,11 +34,16 @@ export async function GET() {
     }
   }
 
+  const checkInPhoto =
+    lastCheckIn?.photoBase64 && lastCheckIn.photoMime
+      ? `data:${lastCheckIn.photoMime};base64,${lastCheckIn.photoBase64}`
+      : null;
+
   return NextResponse.json({
     ok: true,
     status,
-    records,
-    lastCheckIn,
-    lastCheckOut,
+    checkInPhoto,
+    lastCheckInAt: lastCheckIn?.recordedAt ?? null,
+    lastCheckOutAt: lastCheckOut?.recordedAt ?? null,
   });
 }

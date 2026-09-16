@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { formatJalaliDateTime } from "@/lib/jalali";
 
 type UserOption = { id: string; name: string };
 type RecordRow = {
@@ -123,8 +123,8 @@ export default function AdminAttendancePage() {
               )}
               {records.map((r, i) => (
                 <tr key={r.id} className={i % 2 ? "bg-white/[0.02]" : undefined}>
-                  <td className="px-4 py-3" dir="ltr">
-                    {format(new Date(r.recordedAt), "yyyy-MM-dd HH:mm")}
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {formatJalaliDateTime(r.recordedAt)}
                   </td>
                   <td className="px-4 py-3">
                     <div className="font-medium">{r.user.name}</div>

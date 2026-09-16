@@ -10,7 +10,7 @@ const vazirmatn = Vazirmatn({
 });
 
 export const metadata: Metadata = {
-  title: "حضور و غیاب صفردارو",
+  title: "حضور و غیاب صفا دارو",
   description: "سیستم ثبت ورود و خروج پرسنل داروخانه با موقعیت مکانی",
 };
 

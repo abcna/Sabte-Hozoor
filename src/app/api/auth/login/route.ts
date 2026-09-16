@@ -24,7 +24,10 @@ export async function POST(req: Request) {
     });
 
     if (!user || !user.isActive) {
-      return jsonError("نام کاربری یافت نشد یا غیرفعال است.", 401);
+      return jsonError(
+        'نام کاربری دقیقا نام شماست ! مجدد امتحان کن ، اگر نتونستی با بچه های آیتی تماس بگیر "09222676191" زاهدی',
+        401,
+      );
     }
 
     if (user.passwordSet) {
