@@ -2,8 +2,35 @@ import { z } from "zod";
 
 export const loginSchema = z.object({
   username: z.string().min(1),
-  password: z.string().min(1),
+  password: z.string().optional(),
 });
+
+export const profileUpdateSchema = z
+  .object({
+    phone: z.string().optional(),
+    shiftId: z.string().nullable().optional(),
+    password: z.string().optional(),
+    confirmPassword: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const password = data.password?.trim() ?? "";
+    if (!password) return;
+
+    if (password.length < 4) {
+      ctx.addIssue({
+        code: "custom",
+        message: "رمز عبور باید حداقل ۴ کاراکتر باشد.",
+        path: ["password"],
+      });
+    }
+    if (password !== (data.confirmPassword ?? "")) {
+      ctx.addIssue({
+        code: "custom",
+        message: "رمز عبور و تکرار آن یکسان نیست.",
+        path: ["confirmPassword"],
+      });
+    }
+  });
 
 export const coordsSchema = z.object({
   latitude: z.number().min(-90).max(90),
@@ -45,8 +72,9 @@ export const shiftSchema = z.object({
 export const userCreateSchema = z.object({
   name: z.string().min(1),
   username: z.string().min(2),
-  password: z.string().min(4),
-  phone: z.string().min(5),
+  /** Optional — employees can set it via تکمیل پروفایل. */
+  password: z.string().min(4).optional().or(z.literal("")),
+  phone: z.string().optional(),
   role: z.enum(["admin", "employee"]).default("employee"),
   locationId: z.string().nullable().optional(),
   shiftId: z.string().nullable().optional(),
@@ -57,7 +85,7 @@ export const userUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   username: z.string().min(2).optional(),
   password: z.string().min(4).optional(),
-  phone: z.string().min(5).optional(),
+  phone: z.string().optional(),
   role: z.enum(["admin", "employee"]).optional(),
   locationId: z.string().nullable().optional(),
   shiftId: z.string().nullable().optional(),

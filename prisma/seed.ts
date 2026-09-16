@@ -9,11 +9,12 @@ async function main() {
 
   await prisma.user.upsert({
     where: { username: "admin" },
-    update: {},
+    update: { passwordSet: true },
     create: {
       name: "مدیر سیستم",
       username: "admin",
       passwordHash,
+      passwordSet: true,
       phone: "09000000000",
       role: "admin",
       isActive: true,

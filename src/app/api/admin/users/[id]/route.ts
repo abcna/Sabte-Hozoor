@@ -44,13 +44,16 @@ export async function PUT(req: Request, { params }: Params) {
       data: {
         ...(data.name !== undefined ? { name: data.name } : {}),
         ...(data.username !== undefined ? { username: data.username } : {}),
-        ...(data.phone !== undefined ? { phone: data.phone } : {}),
+        ...(data.phone !== undefined ? { phone: data.phone.trim() } : {}),
         ...(data.role !== undefined ? { role: data.role } : {}),
         ...(data.locationId !== undefined ? { locationId: data.locationId } : {}),
         ...(data.shiftId !== undefined ? { shiftId: data.shiftId } : {}),
         ...(data.isActive !== undefined ? { isActive: data.isActive } : {}),
         ...(data.password
-          ? { passwordHash: await hash(data.password, 10) }
+          ? {
+              passwordHash: await hash(data.password, 10),
+              passwordSet: true,
+            }
           : {}),
       },
       include: { location: true, shift: true },

@@ -22,7 +22,9 @@ model User {
   name         String
   username     String   @unique
   passwordHash String
-  phone        String
+  /// True after the user (or admin) has set a real password — login then requires it.
+  passwordSet  Boolean  @default(false)
+  phone        String   @default("")
   role         Role     @default(employee)
   locationId   String?
   shiftId      String?

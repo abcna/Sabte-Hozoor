@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const parsed = loginSchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError("نام کاربری و رمز عبور الزامی است.");
+      return jsonError("نام کاربری الزامی است.");
     }
 
     const { username, password } = parsed.data;
@@ -24,12 +24,17 @@ export async function POST(req: Request) {
     });
 
     if (!user || !user.isActive) {
-      return jsonError("نام کاربری یا رمز عبور اشتباه است.", 401);
+      return jsonError("نام کاربری یافت نشد یا غیرفعال است.", 401);
     }
 
-    const valid = await compare(password, user.passwordHash);
-    if (!valid) {
-      return jsonError("نام کاربری یا رمز عبور اشتباه است.", 401);
+    if (user.passwordSet) {
+      if (!password) {
+        return jsonError("رمز عبور الزامی است.", 401, { requiresPassword: true });
+      }
+      const valid = await compare(password, user.passwordHash);
+      if (!valid) {
+        return jsonError("رمز عبور اشتباه است.", 401, { requiresPassword: true });
+      }
     }
 
     const token = await createSessionToken({

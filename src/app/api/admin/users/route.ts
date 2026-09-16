@@ -48,13 +48,19 @@ export async function POST(req: Request) {
     });
     if (existing) return jsonError("این نام کاربری قبلاً ثبت شده است.");
 
-    const passwordHash = await hash(data.password, 10);
+    // Password is optional at create time — employees set it via تکمیل پروفایل.
+    const hasPassword = !!(data.password && data.password.length >= 4);
+    const rawPassword = hasPassword
+      ? data.password!
+      : `unset-${crypto.randomUUID()}`;
+    const passwordHash = await hash(rawPassword, 10);
     const user = await prisma.user.create({
       data: {
         name: data.name,
         username: data.username,
         passwordHash,
-        phone: data.phone,
+        passwordSet: hasPassword,
+        phone: (data.phone ?? "").trim(),
         role: data.role,
         locationId: data.locationId || null,
         shiftId: data.shiftId || null,

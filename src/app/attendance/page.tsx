@@ -7,11 +7,16 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { SelfieCaptureModal } from "@/components/attendance/SelfieCaptureModal";
+import { LocationHelpAccordion } from "@/components/attendance/LocationHelpAccordion";
+import { CompleteProfileButton } from "@/components/auth/CompleteProfileButton";
 
 type PublicUser = {
   id: string;
   name: string;
   role: string;
+  phone?: string;
+  shiftId?: string | null;
+  passwordSet?: boolean;
   location: { name: string; radiusMeters: number } | null;
   shift: { name: string; startTime: string; endTime: string } | null;
 };
@@ -164,9 +169,15 @@ export default function AttendancePage() {
           <p className="text-xs tracking-[0.15em] text-[var(--accent)]">صفردارو</p>
           <h1 className="mt-1 text-2xl font-semibold">{user?.name}</h1>
         </div>
-        <Button variant="ghost" size="sm" onClick={logout} aria-label="خروج">
-          <LogOut size={16} />
-        </Button>
+        <div className="flex items-center gap-2">
+          <CompleteProfileButton
+            user={user}
+            onSaved={(updated) => setUser(updated as PublicUser)}
+          />
+          <Button variant="ghost" size="sm" onClick={logout} aria-label="خروج">
+            <LogOut size={16} />
+          </Button>
+        </div>
       </header>
 
       <GlassCard className="flex flex-1 flex-col p-6">
@@ -241,6 +252,8 @@ export default function AttendancePage() {
           )}
         </div>
       </GlassCard>
+
+      <LocationHelpAccordion />
 
       <SelfieCaptureModal
         open={cameraOpen}

@@ -83,12 +83,6 @@ export default function AdminUsersPage() {
     setLoading(true);
     setError("");
     try {
-      const payload = {
-        ...form,
-        locationId: form.locationId || null,
-        shiftId: form.shiftId || null,
-      };
-
       const res = await fetch(
         editingId ? `/api/admin/users/${editingId}` : "/api/admin/users",
         {
@@ -106,7 +100,16 @@ export default function AdminUsersPage() {
                   isActive: form.isActive,
                   ...(form.password ? { password: form.password } : {}),
                 }
-              : payload,
+              : {
+                  name: form.name,
+                  username: form.username,
+                  phone: form.phone,
+                  role: form.role,
+                  locationId: form.locationId || null,
+                  shiftId: form.shiftId || null,
+                  isActive: form.isActive,
+                  ...(form.password ? { password: form.password } : {}),
+                },
           ),
         },
       );
@@ -160,17 +163,19 @@ export default function AdminUsersPage() {
             required
           />
           <Input
-            label={editingId ? "رمز عبور (خالی = بدون تغییر)" : "رمز عبور"}
+            label={
+              editingId
+                ? "رمز عبور (خالی = بدون تغییر)"
+                : "رمز عبور (اختیاری — کاربر خودش ست می‌کند)"
+            }
             type="password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            required={!editingId}
           />
           <Input
-            label="شماره تلفن"
+            label="شماره تلفن (اختیاری)"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            required
           />
           <Select
             label="نقش"

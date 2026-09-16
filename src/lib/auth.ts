@@ -99,6 +99,7 @@ export function toPublicUser(user: {
   name: string;
   username: string;
   phone: string;
+  passwordSet: boolean;
   role: Role;
   isActive: boolean;
   locationId: string | null;
@@ -123,6 +124,7 @@ export function toPublicUser(user: {
     name: user.name,
     username: user.username,
     phone: user.phone,
+    passwordSet: user.passwordSet,
     role: user.role,
     isActive: user.isActive,
     locationId: user.locationId,
